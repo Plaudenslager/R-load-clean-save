@@ -18,12 +18,12 @@ To do my own analysis in R or Excel, I need to convert these files into those fo
 
 The code is written in RMD, which is R Markdown.  Most of the file is text-based instructions and commentary written in Markdown, with sections of R code.  R-Studio (www.rstudio.com) can open and recognize this type of file, and using a process called "Knit", it will produce an HTML output document that includes the comments, the code blocks, and the results of the code.  This provides a nice piece of documentation on how you got from the raw data file to the finished files, and is consumable by nearly everyone, with no special software.  This helps remind you of what transformations / additions / deletions you did (or the software did for you), and lets others check your work.
 
-If you don't have easy access to R-Studio, you can just use the code in the code blocks.  Code blocks start with:
-"``` {r}
+If you don't have easy access to R-Studio, you can just use the code in the code blocks.  Code blocks start with:  
+"``` {r}"
 
 and end with 
 
-```" 
+"```" 
 
 Just copy the code blocks (without the tic-marks) to a text file, and run it as R code.
 
@@ -37,4 +37,4 @@ To delete columns, find the heading "Clear out unnecessary columns (manually)". 
 
 The remainder of the program will just display the column names of the cleaned data, and save them to the working directory, using the same name for both files (defined in variables near the top).
 
-I like to keep my analysis in a separate code file, and load the clean data produced in this step.  Use the command __readRDS("__*filename*.csv_")_, where _filename_ is the name you specified for _clean file name_.
+I like to keep my analysis in a separate code file, and load the clean data produced in this step.  Use the command __readRDS("__*filename*.csv __")__, where _filename_ is the name you specified for _clean file name_.
