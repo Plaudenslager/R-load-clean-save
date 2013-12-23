@@ -1,0 +1,104 @@
+Load, Clean, and Save an SPSS File
+========================================================
+
+Load the raw data file from the SPSS format, clean the data, and save it to CSV
+
+### Inputs
+* A single file in SPSS format
+
+### Outputs
+* One cleaned version of the data, in comma-separated-variable format
+* One cleaned version of the data, in R format
+
+### Configuration Settings (set in the code block below)
+* Working directory path
+* File name of the SPSS file
+* File name for the cleaned and converted output files
+* (Optional) A list of column numbers to remove from the data
+
+The R format data file can be loaded by R for future analysis using the command:
+```
+interesting_data <- readRDS("filename.R")
+```
+where:
+* *interesting_data* is your variable name for the dataframe
+* *filename.R* is the filename you specified (below) for **clean_file_name**
+
+## Set project parameters
+```{r}
+working_directory = "~"
+raw_file_name = "your_research_file.sav"
+
+# multiple versions of the clean file will be saved, and the appropriate extension will be applied
+clean_file_name = "Your research file name"
+```
+
+## Load Raw Data
+```{r}
+library(foreign)
+setwd(working_directory)
+raw_data <- read.spss(raw_file_name, to.data.frame = TRUE)
+cat("Sample size =",dim(raw_data)[1],"for",dim(raw_data)[2],"questions / variables")
+colnames(raw_data)
+```
+
+## Clean Data
+### Identify unnecessary columns (automatically)
+Automatically select any columns for removal that have any of the following characteristics:
+* no data
+* the data in every row is the same
+
+```{r}
+cut_list <- 0
+# Iterate across all columns in the data set
+for(col_num in 1:dim(raw_data)[2]){
+  this_column <- raw_data[,col_num]
+
+  # Different tests for factors and other responses
+  if(is.factor(this_column)){
+    
+    # Only one level means all the data is the same, and therefore not interesting
+    if(length(levels(this_column))<2){
+      cut_list <- c(cut_list,col_num)
+    }else{
+      #Need to determine if a factor with 2 or more levels is using more than one of them
+      if(max(table(this_column)) == length(this_column)){
+        cut_list <- c(cut_list,col_num)
+      }
+    }
+  }else{
+    # These columns are not factors
+    if(length(table(this_column))<2){
+      # All rows have the same value, so this column is not interesting
+      cut_list <- c(cut_list,col_num)
+    }
+  }
+}
+
+cut_list <- cut_list[2:length(cut_list)]
+```
+### Highlight columns you may want to remove
+```{r}
+cut_list
+```
+
+### Clear out unnecessary columns (manually)
+Remove any columns that are blank, that were meta-data / not part of the questionaire, or that all have the same answer
+This list should be edited manually; possibly with guidance from the automatically generated list above.
+```{r}
+# put any column numbers you wish to remove between the paranthesis below
+# E.g. remove <- c(1,2,3,4)
+# You can specify a range of columns to remove by using a colon, like this c(2:4, 10:25, 30, 32)
+remove <- c()
+
+clean_data <- subset(raw_data,select=-remove)
+cat("Sample size =",dim(clean_data)[1],"for",dim(clean_data)[2],"questions / variables")
+colnames(clean_data)
+```
+
+## Save to CSV file and to R object file
+
+```{r}
+write.csv(clean_data, file = paste(clean_file_name,"csv", sep="."), row.names = FALSE)
+saveRDS(clean_data, file = paste(clean_file_name,"R", sep="."))
+```
