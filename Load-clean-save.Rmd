@@ -96,6 +96,12 @@ cat("Sample size =",dim(clean_data)[1],"for",dim(clean_data)[2],"questions / var
 colnames(clean_data)
 ```
 
+## Create a schema table that describes the columns
+```{r}
+db_schema <- data.frame(Column_Names = colnames(clean_data))
+db_schema$Type <- sapply(clean_data[1,],typeof)
+```
+
 ## Save to CSV file and to R object file
 
 ```{r}
